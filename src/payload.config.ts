@@ -7,6 +7,9 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Clients } from './collections/Clients'
+import { Vehicles } from './collections/Vehicles'
+import { ServiceRecords } from './collections/ServiceRecords'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -17,8 +20,11 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: '- MV Auto Servis',
+    },
   },
-  collections: [Users, Media],
+  collections: [Users, Media, Clients, Vehicles, ServiceRecords],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -30,5 +36,19 @@ export default buildConfig({
     },
   }),
   sharp,
+  localization: {
+    locales: [
+      {
+        label: 'Srpski',
+        code: 'sr',
+      },
+      {
+        label: 'English',
+        code: 'en',
+      },
+    ],
+    defaultLocale: 'sr',
+    fallback: true,
+  },
   plugins: [],
 })
