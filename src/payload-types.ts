@@ -68,10 +68,12 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
-    media: Media;
     clients: Client;
     vehicles: Vehicle;
-    'service-records': ServiceRecord;
+    services: Service;
+    'part-purchases': PartPurchase;
+    tools: Tool;
+    media: Media;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,10 +82,12 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
     clients: ClientsSelect<false> | ClientsSelect<true>;
     vehicles: VehiclesSelect<false> | VehiclesSelect<true>;
-    'service-records': ServiceRecordsSelect<false> | ServiceRecordsSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    'part-purchases': PartPurchasesSelect<false> | PartPurchasesSelect<true>;
+    tools: ToolsSelect<false> | ToolsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -92,13 +96,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('sr' | 'en') | ('sr' | 'en')[];
+  fallbackLocale: null;
   globals: {};
   globalsSelect: {};
-  locale: 'sr' | 'en';
-  user: User & {
-    collection: 'users';
+  locale: null;
+  widgets: {
+    collections: CollectionsWidget;
   };
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -128,6 +133,8 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  ime: string;
+  uloga: 'vlasnik' | 'mehanicar' | 'pomocni';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -145,6 +152,50 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+  collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clients".
+ */
+export interface Client {
+  id: number;
+  firstName: string;
+  lastName?: string | null;
+  phone: string;
+  email?: string | null;
+  address?: string | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vehicles".
+ */
+export interface Vehicle {
+  id: number;
+  client: number | Client;
+  brand?: string | null;
+  model: string;
+  year?: number | null;
+  registrationNumber?: string | null;
+  vin: string;
+  engine?: string | null;
+  fuelType?: string | null;
+  engineCapacity?: string | null;
+  power?: string | null;
+  color?: string | null;
+  currentMileage?: number | null;
+  note?: string | null;
+  gallery?:
+    | {
+        file: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -152,7 +203,8 @@ export interface User {
  */
 export interface Media {
   id: number;
-  alt: string;
+  alt?: string | null;
+  tip?: ('slika-vozila' | 'slika-kvara' | 'racun' | 'ostalo') | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -164,78 +216,121 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    thumb?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "clients".
+ * via the `definition` "services".
  */
-export interface Client {
-  id: number;
-  fullName: string;
-  phone: string;
-  email?: string | null;
-  /**
-   * Additional information about the client
-   */
-  notes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vehicles".
- */
-export interface Vehicle {
-  id: number;
-  client: number | Client;
-  brand: string;
-  model: string;
-  year?: number | null;
-  licensePlate: string;
-  /**
-   * Vehicle Identification Number
-   */
-  vin?: string | null;
-  engineType?: ('petrol' | 'diesel' | 'hybrid' | 'electric') | null;
-  /**
-   * Additional information about the vehicle
-   */
-  notes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "service-records".
- */
-export interface ServiceRecord {
+export interface Service {
   id: number;
   vehicle: number | Vehicle;
+  client?: (number | null) | Client;
+  clientSnapshotName?: string | null;
+  serviceType: 'mali-servis' | 'veliki-servis' | 'popravka-kvara' | 'dijagnostika' | 'limarija-ostalo';
   serviceDate: string;
-  /**
-   * Current vehicle mileage
-   */
-  mileage?: number | null;
-  /**
-   * Detailed description of work performed
-   */
+  mileage: number;
   description: string;
-  /**
-   * Labor costs
-   */
-  laborCost: number;
-  /**
-   * Cost of spare parts
-   */
-  partsCost: number;
-  /**
-   * Automatically calculated as Labor Cost + Parts Cost
-   */
-  totalCost?: number | null;
-  /**
-   * Additional service notes
-   */
-  notes?: string | null;
+  partsUsed?:
+    | {
+        partName?: string | null;
+        brand?: string | null;
+        partCode?: string | null;
+        quantity?: number | null;
+        purchasePrice?: number | null;
+        salePrice?: number | null;
+        supplier?: string | null;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  laborPrice?: number | null;
+  partsPrice?: number | null;
+  totalPrice?: number | null;
+  paymentStatus?: ('placeno' | 'nije-placeno' | 'delimisno-placeno') | null;
+  paymentMethod?: ('gotovina' | 'kartica' | 'virman') | null;
+  partsInvoiceFiles?:
+    | {
+        file: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  issueImages?:
+    | {
+        file: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  afterRepairImages?:
+    | {
+        file: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  internalNote?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "part-purchases".
+ */
+export interface PartPurchase {
+  id: number;
+  purchaseDate?: string | null;
+  supplier?: string | null;
+  invoiceNumber?: string | null;
+  totalAmount?: number | null;
+  invoiceFiles?:
+    | {
+        file: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  items?:
+    | {
+        name?: string | null;
+        code?: string | null;
+        quantity?: number | null;
+        unitPrice?: number | null;
+        total?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tools".
+ */
+export interface Tool {
+  id: number;
+  name: string;
+  category?: string | null;
+  description?: string | null;
+  serialNumber?: string | null;
+  purchaseDate?: string | null;
+  purchasePrice?: number | null;
+  locationInWorkshop?: string | null;
+  condition?: ('ispravno' | 'na-servisu' | 'neispravno' | 'rashodovano') | null;
+  images?:
+    | {
+        file: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  note?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -268,10 +363,6 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
         relationTo: 'clients';
         value: number | Client;
       } | null)
@@ -280,8 +371,20 @@ export interface PayloadLockedDocument {
         value: number | Vehicle;
       } | null)
     | ({
-        relationTo: 'service-records';
-        value: number | ServiceRecord;
+        relationTo: 'services';
+        value: number | Service;
+      } | null)
+    | ({
+        relationTo: 'part-purchases';
+        value: number | PartPurchase;
+      } | null)
+    | ({
+        relationTo: 'tools';
+        value: number | Tool;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -330,6 +433,8 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  ime?: T;
+  uloga?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -349,31 +454,15 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "clients_select".
  */
 export interface ClientsSelect<T extends boolean = true> {
-  fullName?: T;
+  firstName?: T;
+  lastName?: T;
   phone?: T;
   email?: T;
-  notes?: T;
+  address?: T;
+  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -386,28 +475,160 @@ export interface VehiclesSelect<T extends boolean = true> {
   brand?: T;
   model?: T;
   year?: T;
-  licensePlate?: T;
+  registrationNumber?: T;
   vin?: T;
-  engineType?: T;
-  notes?: T;
+  engine?: T;
+  fuelType?: T;
+  engineCapacity?: T;
+  power?: T;
+  color?: T;
+  currentMileage?: T;
+  note?: T;
+  gallery?:
+    | T
+    | {
+        file?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "service-records_select".
+ * via the `definition` "services_select".
  */
-export interface ServiceRecordsSelect<T extends boolean = true> {
+export interface ServicesSelect<T extends boolean = true> {
   vehicle?: T;
+  client?: T;
+  clientSnapshotName?: T;
+  serviceType?: T;
   serviceDate?: T;
   mileage?: T;
   description?: T;
-  laborCost?: T;
-  partsCost?: T;
-  totalCost?: T;
-  notes?: T;
+  partsUsed?:
+    | T
+    | {
+        partName?: T;
+        brand?: T;
+        partCode?: T;
+        quantity?: T;
+        purchasePrice?: T;
+        salePrice?: T;
+        supplier?: T;
+        note?: T;
+        id?: T;
+      };
+  laborPrice?: T;
+  partsPrice?: T;
+  totalPrice?: T;
+  paymentStatus?: T;
+  paymentMethod?: T;
+  partsInvoiceFiles?:
+    | T
+    | {
+        file?: T;
+        id?: T;
+      };
+  issueImages?:
+    | T
+    | {
+        file?: T;
+        id?: T;
+      };
+  afterRepairImages?:
+    | T
+    | {
+        file?: T;
+        id?: T;
+      };
+  internalNote?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "part-purchases_select".
+ */
+export interface PartPurchasesSelect<T extends boolean = true> {
+  purchaseDate?: T;
+  supplier?: T;
+  invoiceNumber?: T;
+  totalAmount?: T;
+  invoiceFiles?:
+    | T
+    | {
+        file?: T;
+        id?: T;
+      };
+  items?:
+    | T
+    | {
+        name?: T;
+        code?: T;
+        quantity?: T;
+        unitPrice?: T;
+        total?: T;
+        id?: T;
+      };
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tools_select".
+ */
+export interface ToolsSelect<T extends boolean = true> {
+  name?: T;
+  category?: T;
+  description?: T;
+  serialNumber?: T;
+  purchaseDate?: T;
+  purchasePrice?: T;
+  locationInWorkshop?: T;
+  condition?: T;
+  images?:
+    | T
+    | {
+        file?: T;
+        id?: T;
+      };
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  tip?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumb?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -448,6 +669,16 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_widget".
+ */
+export interface CollectionsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

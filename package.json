@@ -1,51 +1,46 @@
 {
-  "name": "mv-service",
+  "name": "mv-servis",
   "version": "1.0.0",
-  "description": "A blank template to get started with Payload 3.0",
+  "private": true,
+  "description": "Privatna PWA aplikacija za evidenciju auto mehanicarskog servisa",
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
-    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
-    "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
-    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "pnpm run test:int && pnpm run test:e2e",
-    "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint . --max-warnings=0",
+    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "seed:default-user": "cross-env NODE_OPTIONS=--no-deprecation payload run ./src/scripts/seed-default-super-user.ts",
+    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap"
   },
   "dependencies": {
-    "@payloadcms/next": "3.69.0",
-    "@payloadcms/richtext-lexical": "3.69.0",
-    "@payloadcms/ui": "3.69.0",
+    "@payloadcms/db-postgres": "3.78.0",
+    "@payloadcms/next": "3.78.0",
+    "@payloadcms/richtext-lexical": "3.78.0",
+    "@payloadcms/translations": "3.78.0",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
     "graphql": "^16.8.1",
-    "next": "15.4.10",
-    "payload": "3.69.0",
-    "react": "19.2.1",
-    "react-dom": "19.2.1",
-    "sharp": "0.34.2",
-    "@payloadcms/db-postgres": "3.69.0"
+    "next": "16.1.6",
+    "payload": "3.78.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "sharp": "0.34.2"
   },
   "devDependencies": {
-    "@playwright/test": "1.56.1",
-    "@testing-library/react": "16.3.0",
-    "@types/node": "^22.5.4",
-    "@types/react": "19.2.1",
-    "@types/react-dom": "19.2.1",
-    "@vitejs/plugin-react": "4.5.2",
+    "@types/node": "25.3.3",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "eslint": "^9.16.0",
-    "eslint-config-next": "15.4.7",
-    "jsdom": "26.1.0",
-    "playwright": "1.56.1",
-    "playwright-core": "1.56.1",
-    "prettier": "^3.4.2",
-    "typescript": "5.7.3",
-    "vite-tsconfig-paths": "5.1.4",
-    "vitest": "3.2.3"
-  }
+    "eslint-config-next": "16.1.6",
+    "prettier": "^3.8.1",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=20.9.0",
+    "npm": ">=10"
+  },
+  "packageManager": "pnpm@10.26.1+sha512.664074abc367d2c9324fdc18037097ce0a8f126034160f709928e9e9f95d98714347044e5c3164d65bd5da6c59c6be362b107546292a8eecb7999196e5ce58fa"
 }

@@ -1,157 +1,130 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
+
+import { isAuthenticated } from '@/lib/access'
+
+const galleryField: Field = {
+  name: 'gallery',
+  type: 'array',
+  label: 'Galerija vozila',
+  labels: {
+    plural: 'Slike',
+    singular: 'Slika',
+  },
+  fields: [
+    {
+      name: 'file',
+      type: 'upload',
+      label: 'Fajl',
+      relationTo: 'media',
+      required: true,
+    },
+  ],
+}
 
 export const Vehicles: CollectionConfig = {
   slug: 'vehicles',
   labels: {
-    singular: {
-      sr: 'Vozilo',
-      en: 'Vehicle',
-    },
-    plural: {
-      sr: 'Vozila',
-      en: 'Vehicles',
-    },
-  },
-  admin: {
-    defaultColumns: ['licensePlate', 'client', 'brand', 'model', 'year'],
-    useAsTitle: 'licensePlate',
-    group: {
-      sr: 'Upravljanje',
-      en: 'Management',
-    },
+    plural: 'Vozila',
+    singular: 'Vozilo',
   },
   access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
+    create: isAuthenticated,
+    delete: isAuthenticated,
+    read: isAuthenticated,
+    update: isAuthenticated,
+  },
+  admin: {
+    defaultColumns: ['client', 'brand', 'model', 'registrationNumber', 'vin', 'currentMileage'],
+    useAsTitle: 'model',
   },
   fields: [
     {
       name: 'client',
-      label: {
-        sr: 'Mušterija',
-        en: 'Client',
-      },
       type: 'relationship',
+      index: true,
+      label: 'Klijent',
       relationTo: 'clients',
       required: true,
-      hasMany: false,
-      index: true,
     },
     {
       name: 'brand',
-      label: {
-        sr: 'Marka',
-        en: 'Brand',
-      },
       type: 'text',
-      required: true,
       index: true,
+      label: 'Marka',
     },
     {
       name: 'model',
-      label: {
-        sr: 'Model',
-        en: 'Model',
-      },
       type: 'text',
-      required: true,
       index: true,
+      label: 'Model',
+      required: true,
     },
     {
       name: 'year',
-      label: {
-        sr: 'Godina',
-        en: 'Year',
-      },
       type: 'number',
-      required: false,
-      min: 1900,
-      max: new Date().getFullYear() + 1,
+      label: 'Godiste',
     },
     {
-      name: 'licensePlate',
-      label: {
-        sr: 'Registarska Tablica',
-        en: 'License Plate',
-      },
+      name: 'registrationNumber',
       type: 'text',
-      required: true,
-      unique: true,
       index: true,
+      label: 'Registracija',
     },
     {
       name: 'vin',
-      label: {
-        sr: 'VIN Broj',
-        en: 'VIN',
-      },
       type: 'text',
-      required: false,
       index: true,
-      admin: {
-        description: {
-          sr: 'Jedinstveni identifikacioni broj vozila',
-          en: 'Vehicle Identification Number',
-        },
-      },
+      label: 'Broj sasije',
+      required: true,
+      unique: true,
     },
     {
-      name: 'engineType',
-      label: {
-        sr: 'Tip Motora',
-        en: 'Engine Type',
-      },
-      type: 'select',
-      required: false,
-      options: [
-        {
-          label: {
-            sr: 'Benzin',
-            en: 'Petrol',
-          },
-          value: 'petrol',
-        },
-        {
-          label: {
-            sr: 'Dizel',
-            en: 'Diesel',
-          },
-          value: 'diesel',
-        },
-        {
-          label: {
-            sr: 'Hibrid',
-            en: 'Hybrid',
-          },
-          value: 'hybrid',
-        },
-        {
-          label: {
-            sr: 'Električni',
-            en: 'Electric',
-          },
-          value: 'electric',
-        },
-      ],
-      defaultValue: 'petrol',
+      name: 'engine',
+      type: 'text',
+      label: 'Motor',
     },
     {
-      name: 'notes',
-      label: {
-        sr: 'Napomene',
-        en: 'Notes',
-      },
+      name: 'fuelType',
+      type: 'text',
+      label: 'Tip goriva',
+    },
+    {
+      name: 'engineCapacity',
+      type: 'text',
+      label: 'Kubikaza',
+    },
+    {
+      name: 'power',
+      type: 'text',
+      label: 'Snaga',
+    },
+    {
+      name: 'color',
+      type: 'text',
+      label: 'Boja',
+    },
+    {
+      name: 'currentMileage',
+      type: 'number',
+      label: 'Trenutna kilometraza',
+    },
+    {
+      name: 'note',
       type: 'textarea',
-      localized: true,
-      required: false,
-      admin: {
-        description: {
-          sr: 'Dodatne informacije o vozilu',
-          en: 'Additional information about the vehicle',
-        },
-      },
+      label: 'Napomena',
+    },
+    galleryField,
+  ],
+  indexes: [
+    {
+      fields: ['vin'],
+      unique: true,
+    },
+    {
+      fields: ['registrationNumber'],
+    },
+    {
+      fields: ['model'],
     },
   ],
 }

@@ -1,77 +1,67 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+
+import { isAuthenticated } from '@/lib/access'
 
 export const Clients: CollectionConfig = {
   slug: 'clients',
   labels: {
-    singular: {
-      sr: 'Mušterija',
-      en: 'Client',
-    },
-    plural: {
-      sr: 'Mušterije',
-      en: 'Clients',
-    },
-  },
-  admin: {
-    defaultColumns: ['fullName', 'phone', 'email'],
-    useAsTitle: 'fullName',
-    group: {
-      sr: 'Upravljanje',
-      en: 'Management',
-    },
+    plural: 'Klijenti',
+    singular: 'Klijent',
   },
   access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
+    create: isAuthenticated,
+    delete: isAuthenticated,
+    read: isAuthenticated,
+    update: isAuthenticated,
+  },
+  admin: {
+    defaultColumns: ['firstName', 'lastName', 'phone', 'email', 'updatedAt'],
+    useAsTitle: 'firstName',
   },
   fields: [
     {
-      name: 'fullName',
-      label: {
-        sr: 'Ime i Prezime',
-        en: 'Full Name',
-      },
+      name: 'firstName',
       type: 'text',
-      required: true,
       index: true,
+      label: 'Ime',
+      required: true,
+    },
+    {
+      name: 'lastName',
+      type: 'text',
+      index: true,
+      label: 'Prezime',
     },
     {
       name: 'phone',
-      label: {
-        sr: 'Telefon',
-        en: 'Phone',
-      },
       type: 'text',
-      required: true,
       index: true,
+      label: 'Telefon',
+      required: true,
     },
     {
       name: 'email',
-      label: {
-        sr: 'Email',
-        en: 'Email',
-      },
       type: 'email',
-      required: false,
       index: true,
+      label: 'Email',
     },
     {
-      name: 'notes',
-      label: {
-        sr: 'Napomene',
-        en: 'Notes',
-      },
+      name: 'address',
+      type: 'text',
+      label: 'Adresa',
+    },
+    {
+      name: 'note',
       type: 'textarea',
-      localized: true,
-      required: false,
-      admin: {
-        description: {
-          sr: 'Dodatne informacije o mušteriji',
-          en: 'Additional information about the client',
-        },
-      },
+      label: 'Napomena',
+    },
+  ],
+  indexes: [
+    {
+      fields: ['firstName', 'lastName'],
+    },
+    {
+      fields: ['phone'],
     },
   ],
 }
