@@ -13,6 +13,9 @@ const nextConfig = {
 
     return webpackConfig
   },
+  reactStrictMode: true,
+  output: 'standalone',
+
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })
