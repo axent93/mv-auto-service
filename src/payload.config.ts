@@ -17,7 +17,59 @@ import { ensureDefaultSuperUser } from './lib/ensureDefaultSuperUser'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+
+const stripTrailingSlash = (value: string): string => value.replace(/\/+$/, '')
+
+const readOrigin = (value?: string): string | undefined => {
+  if (!value) {
+    return undefined
+  }
+
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return undefined
+  }
+
+  return stripTrailingSlash(trimmed)
+}
+
+const readRailwayOrigin = (value?: string): string | undefined => {
+  if (!value) {
+    return undefined
+  }
+
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return undefined
+  }
+
+  const withProtocol =
+    trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`
+
+  return stripTrailingSlash(withProtocol)
+}
+
+const serverURL =
+  readOrigin(process.env.NEXT_PUBLIC_SERVER_URL) ||
+  readOrigin(process.env.SERVER_URL) ||
+  readOrigin(process.env.RAILWAY_STATIC_URL) ||
+  readRailwayOrigin(process.env.RAILWAY_PUBLIC_DOMAIN) ||
+  'http://localhost:3000'
+
+const csrf = Array.from(
+  new Set(
+    [
+      serverURL,
+      readOrigin(process.env.NEXT_PUBLIC_SERVER_URL),
+      readOrigin(process.env.SERVER_URL),
+      readOrigin(process.env.RAILWAY_STATIC_URL),
+      readRailwayOrigin(process.env.RAILWAY_PUBLIC_DOMAIN),
+      ...(process.env.PAYLOAD_CSRF_ORIGINS?.split(',').map((origin) => readOrigin(origin)) || []),
+    ].filter((origin): origin is string => Boolean(origin)),
+  ),
+)
 
 export default buildConfig({
   admin: {
@@ -62,6 +114,7 @@ export default buildConfig({
       'rs-latin': rsLatin,
     },
   },
+  csrf,
   secret: process.env.PAYLOAD_SECRET || '',
   serverURL,
   onInit: async (payload) => {
