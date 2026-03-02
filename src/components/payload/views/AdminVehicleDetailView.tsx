@@ -199,7 +199,8 @@ export const AdminVehicleDetailView = async ({
           <h2>Istorija servisa</h2>
           <a href={adminLink('/collections/services')}>Svi servisi</a>
         </div>
-        <div className="mv-table-wrap">
+
+        <div className="mv-table-wrap mv-vehicle-history__desktop">
           <table className="mv-table">
             <thead>
               <tr>
@@ -267,6 +268,50 @@ export const AdminVehicleDetailView = async ({
             </tbody>
           </table>
         </div>
+
+        <ul className="mv-list mv-vehicle-history__mobile">
+          {services.length === 0 ? (
+            <li>Za ovo vozilo jos nema unetih servisa.</li>
+          ) : (
+            services.map((service, index) => {
+              const serviceRecord = toRecord(service)
+              const serviceID = relationId(serviceRecord)
+              const serviceType = readString(serviceRecord, 'serviceType')
+              const paymentStatus = readString(serviceRecord, 'paymentStatus')
+              const issueCount = Array.isArray(serviceRecord?.issueImages) ? serviceRecord.issueImages.length : 0
+              const afterCount = Array.isArray(serviceRecord?.afterRepairImages)
+                ? serviceRecord.afterRepairImages.length
+                : 0
+              const invoiceCount = Array.isArray(serviceRecord?.partsInvoiceFiles)
+                ? serviceRecord.partsInvoiceFiles.length
+                : 0
+              const totalPriceValue = serviceRecord?.totalPrice
+              const totalPrice =
+                typeof totalPriceValue === 'number' && Number.isFinite(totalPriceValue) ? totalPriceValue : null
+
+              return (
+                <li key={`mobile-${serviceID || `${serviceType}-${index}`}`}>
+                  <div>
+                    <strong>{serviceTypeLabels[serviceType] || serviceType || '-'}</strong>
+                    <p>Datum: {formatDate(readString(serviceRecord, 'serviceDate'))}</p>
+                    <p>Kilometraza: {formatNumber(readNumber(serviceRecord, 'mileage'))}</p>
+                    <p>Status: {paymentStatusLabels[paymentStatus] || '-'}</p>
+                    <p>Ukupno: {formatCurrency(totalPrice)}</p>
+                    <p>{readString(serviceRecord, 'description') || '-'}</p>
+                    <p>
+                      Kvar: {issueCount} | Posle: {afterCount} | Racuni: {invoiceCount}
+                    </p>
+                  </div>
+                  <div className="mv-inline-links">
+                    {serviceID ? <a href={adminLink(`/servisi/${serviceID}`)}>Detalj</a> : null}
+                    {serviceID ? <a href={adminLink(`/collections/services/${serviceID}`)}>Admin</a> : null}
+                    {!serviceID ? '-' : null}
+                  </div>
+                </li>
+              )
+            })
+          )}
+        </ul>
       </section>
     </div>
   )

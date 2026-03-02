@@ -49,7 +49,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   initialScale: 1,
+  maximumScale: 1,
+  minimumScale: 1,
   themeColor: '#0f172a',
+  userScalable: false,
   viewportFit: 'cover',
   width: 'device-width',
 }

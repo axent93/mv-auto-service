@@ -231,7 +231,7 @@ export const AdminServiceDetailView = async ({
         {partsRows.length === 0 ? (
           <p>Nema unetih delova za ovaj servis.</p>
         ) : (
-          <div className="mv-table-wrap">
+          <div className="mv-table-wrap mv-service-parts__desktop">
             <table className="mv-table">
               <thead>
                 <tr>
@@ -262,6 +262,25 @@ export const AdminServiceDetailView = async ({
             </table>
           </div>
         )}
+
+        {partsRows.length > 0 ? (
+          <ul className="mv-list mv-service-parts__mobile">
+            {partsRows.map((part, index) => (
+              <li key={`mobile-part-${readString(part, 'partCode') || readString(part, 'partName') || index}`}>
+                <div>
+                  <strong>{readString(part, 'partName') || '-'}</strong>
+                  <p>Brend: {readString(part, 'brand') || '-'}</p>
+                  <p>Sifra: {readString(part, 'partCode') || '-'}</p>
+                  <p>Kolicina: {formatNumber(readNumber(part, 'quantity'))}</p>
+                  <p>Nabavna: {formatCurrency(readNumber(part, 'purchasePrice'))}</p>
+                  <p>Prodajna: {formatCurrency(readNumber(part, 'salePrice'))}</p>
+                  <p>Dobavljac: {readString(part, 'supplier') || '-'}</p>
+                  <p>{readString(part, 'note') || '-'}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </section>
 
       <section className="mv-admin-grid mv-admin-grid--split">
