@@ -1,5 +1,6 @@
 import type { Payload, ServerProps } from 'payload'
 import { formatAdminURL } from 'payload/shared'
+import { useId } from 'react'
 
 const links = [
   {
@@ -29,7 +30,7 @@ const links = [
   {
     key: 'services',
     label: 'Servisi',
-    matchers: ['/collections/services'],
+    matchers: ['/collections/services', '/servisi'],
     path: '/collections/services',
   },
   {
@@ -109,7 +110,9 @@ export const MVHeaderNav = ({
   logoutPath,
   standalone = false,
 }: MVHeaderNavProps) => {
+  const uniqueID = useId().replace(/:/g, '')
   const classNames = ['mv-header-tools']
+  const drawerID = `mv-nav-drawer-${standalone ? 'standalone' : 'main'}-${uniqueID}`
 
   if (standalone) {
     classNames.push('mv-header-tools--standalone')
@@ -117,6 +120,14 @@ export const MVHeaderNav = ({
 
   return (
     <div className={classNames.join(' ')}>
+      <input className="mv-mobile-nav__toggle" id={drawerID} type="checkbox" />
+
+      <label aria-label="Otvori navigaciju" className="mv-mobile-nav__burger" htmlFor={drawerID}>
+        <span />
+        <span />
+        <span />
+      </label>
+
       <a className="mv-header-brand" href={toAdminLink(adminRoute, '/')}>
         <span className="mv-header-brand__mark">MV</span>
         <span className="mv-header-brand__label">MV servis</span>
@@ -144,6 +155,29 @@ export const MVHeaderNav = ({
           Odjavi se
         </a>
       </div>
+
+      <label aria-hidden className="mv-mobile-nav__backdrop" htmlFor={drawerID} />
+
+      <aside className="mv-mobile-nav__drawer">
+        <div className="mv-mobile-nav__drawer-head">
+          <strong>Navigacija</strong>
+          <label aria-label="Zatvori navigaciju" className="mv-mobile-nav__close" htmlFor={drawerID}>
+            ×
+          </label>
+        </div>
+
+        <nav aria-label="Mobilna navigacija" className="mv-mobile-nav__links">
+          {links.map((link) => (
+            <a
+              className={`mv-mobile-nav__link${isLinkActive(currentPath, link.matchers) ? ' is-active' : ''}`}
+              href={toAdminLink(adminRoute, link.path)}
+              key={`mobile-${link.key}`}
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      </aside>
     </div>
   )
 }

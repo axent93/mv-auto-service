@@ -94,6 +94,10 @@ export default buildConfig({
           Component: '@/components/payload/views/AdminVehicleDetailView#AdminVehicleDetailView',
           path: '/vozila/:id',
         },
+        servisDetalj: {
+          Component: '@/components/payload/views/AdminServiceDetailView#AdminServiceDetailView',
+          path: '/servisi/:id',
+        },
       },
     },
     importMap: {

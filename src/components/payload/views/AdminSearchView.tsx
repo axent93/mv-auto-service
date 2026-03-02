@@ -5,14 +5,7 @@ import { DebouncedAdminSearchInput } from '@/components/payload/DebouncedAdminSe
 import { MVHeaderNav, resolveAdminLogoutPath } from '@/components/payload/HeaderQuickLinks'
 import { relationId, readString, toRecord } from '@/lib/doc'
 import { formatDate } from '@/lib/formatters'
-
-const serviceTypeLabels: Record<string, string> = {
-  dijagnostika: 'Dijagnostika',
-  'limarija-ostalo': 'Limarija / ostalo',
-  'mali-servis': 'Mali servis',
-  'popravka-kvara': 'Popravka kvara',
-  'veliki-servis': 'Veliki servis',
-}
+import { getClientName, getVehicleName, serviceTypeLabels } from '@/lib/view-helpers'
 
 const findServiceTypeMatches = (term: string): string[] => {
   const value = term.toLowerCase()
@@ -39,26 +32,6 @@ const findServiceTypeMatches = (term: string): string[] => {
   }
 
   return Array.from(matched)
-}
-
-const getClientName = (client: unknown): string => {
-  const record = toRecord(client)
-  const firstName = readString(record, 'firstName')
-  const lastName = readString(record, 'lastName')
-
-  return [firstName, lastName].filter(Boolean).join(' ').trim() || '-'
-}
-
-const getVehicleName = (vehicle: unknown): string => {
-  const record = toRecord(vehicle)
-  const brand = readString(record, 'brand')
-  const model = readString(record, 'model')
-  const registration = readString(record, 'registrationNumber')
-  const vin = readString(record, 'vin')
-  const baseName = [brand, model].filter(Boolean).join(' ')
-  const marker = registration || vin
-
-  return marker ? `${baseName} (${marker})` : baseName || '-'
 }
 
 const dedupeByRelationID = (items: unknown[]): unknown[] => {
@@ -339,6 +312,8 @@ export const AdminSearchView = async ({
                   const vehicleID = relationId(vehicle)
                   const vehicleName = getVehicleName(vehicle)
                   const serviceType = readString(serviceRecord, 'serviceType')
+                  const clientName =
+                    readString(serviceRecord, 'clientSnapshotName') || getClientName(toRecord(vehicle)?.client)
 
                   return (
                     <li key={id || `${serviceType}-${index}`}>
@@ -347,9 +322,11 @@ export const AdminSearchView = async ({
                         <p>
                           {formatDate(readString(serviceRecord, 'serviceDate'))} | {vehicleName}
                         </p>
+                        <p>Vlasnik: {clientName || '-'}</p>
                       </div>
                       <div className="mv-inline-links">
                         {vehicleID ? <a href={adminLink(`/vozila/${vehicleID}`)}>Vozilo</a> : null}
+                        {id ? <a href={adminLink(`/servisi/${id}`)}>Detalj</a> : null}
                         {id ? <a href={adminLink(`/collections/services/${id}`)}>Admin</a> : null}
                       </div>
                     </li>

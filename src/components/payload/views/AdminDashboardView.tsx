@@ -154,6 +154,7 @@ export const AdminDashboardView = async ({ payload, initPageResult }: AdminViewS
               ) : (
                 latestServices.map((service, index) => {
                   const serviceRecord = toRecord(service)
+                  const serviceID = relationId(serviceRecord)
                   const vehicle = serviceRecord?.vehicle
                   const vehicleID = relationId(vehicle)
                   const vehicleName = getVehicleName(vehicle)
@@ -178,7 +179,11 @@ export const AdminDashboardView = async ({ payload, initPageResult }: AdminViewS
                       <td>{paymentStatusLabels[paymentStatus] || '-'}</td>
                       <td>{formatCurrency(totalPrice)}</td>
                       <td>
-                        {vehicleID ? <a href={adminLink(`/vozila/${vehicleID}`)}>Vozilo</a> : '-'}
+                        <div className="mv-inline-links">
+                          {serviceID ? <a href={adminLink(`/servisi/${serviceID}`)}>Servis</a> : null}
+                          {vehicleID ? <a href={adminLink(`/vozila/${vehicleID}`)}>Vozilo</a> : null}
+                          {!serviceID && !vehicleID ? '-' : null}
+                        </div>
                       </td>
                     </tr>
                   )

@@ -5,64 +5,22 @@ import { formatAdminURL } from 'payload/shared'
 import { MVHeaderNav, resolveAdminLogoutPath } from '@/components/payload/HeaderQuickLinks'
 import { relationId, readNumber, readString, toRecord } from '@/lib/doc'
 import { formatCurrency, formatDate, formatNumber } from '@/lib/formatters'
-
-const serviceTypeLabels: Record<string, string> = {
-  dijagnostika: 'Dijagnostika',
-  'limarija-ostalo': 'Limarija / ostalo',
-  'mali-servis': 'Mali servis',
-  'popravka-kvara': 'Popravka kvara',
-  'veliki-servis': 'Veliki servis',
-}
-
-const paymentStatusLabels: Record<string, string> = {
-  'delimisno-placeno': 'Delimisno placeno',
-  'nije-placeno': 'Nije placeno',
-  placeno: 'Placeno',
-}
-
-const mediaFileFromArrayRow = (row: unknown): null | Record<string, unknown> => {
-  const rowRecord = toRecord(row)
-  const fileValue = rowRecord?.file
-
-  return toRecord(fileValue)
-}
-
-const mediaLink = (mediaRecord: null | Record<string, unknown>) => {
-  if (!mediaRecord) {
-    return null
-  }
-
-  const url = readString(mediaRecord, 'url')
-  const filename = readString(mediaRecord, 'filename') || 'fajl'
-  const mimeType = readString(mediaRecord, 'mimeType')
-
-  if (!url) {
-    return null
-  }
-
-  return {
-    filename,
-    isImage: mimeType.startsWith('image/'),
-    url,
-  }
-}
-
-const normalizeID = (id: string): number | string => {
-  if (/^\d+$/.test(id)) {
-    return Number(id)
-  }
-
-  return id
-}
+import {
+  extractDetailIDFromParams,
+  getClientName,
+  mediaLinkFromArrayRow,
+  normalizeDocumentID,
+  paymentStatusLabels,
+  serviceTypeLabels,
+} from '@/lib/view-helpers'
 
 export const AdminVehicleDetailView = async ({
   params,
   payload,
   initPageResult,
 }: AdminViewServerProps) => {
-  const rawID = params?.id
   const req = initPageResult.req
-  const idFromParams = Array.isArray(rawID) ? rawID[0] : rawID
+  const idFromParams = extractDetailIDFromParams(params, 'vozila')
   const adminRoute = payload.config.routes.admin
   const logoutPath = resolveAdminLogoutPath(payload)
   const adminLink = (path: string) =>
@@ -81,7 +39,7 @@ export const AdminVehicleDetailView = async ({
     </section>
   )
 
-  if (!idFromParams || typeof idFromParams !== 'string') {
+  if (!idFromParams) {
     return (
       <div className="mv-admin-view gutter--left gutter--right">
         {topBar}
@@ -94,7 +52,7 @@ export const AdminVehicleDetailView = async ({
     )
   }
 
-  const documentID = normalizeID(idFromParams)
+  const documentID = normalizeDocumentID(idFromParams)
   let vehicle: unknown = null
 
   try {
@@ -138,13 +96,12 @@ export const AdminVehicleDetailView = async ({
 
   const services = servicesResult.docs as unknown[]
   const client = toRecord(vehicleRecord.client)
-  const clientName = [readString(client, 'firstName'), readString(client, 'lastName')]
-    .filter(Boolean)
-    .join(' ')
-    .trim()
+  const clientName = getClientName(client)
 
   const galleryRows = Array.isArray(vehicleRecord.gallery) ? vehicleRecord.gallery : []
-  const galleryFiles = galleryRows.map(mediaFileFromArrayRow).map(mediaLink).filter(Boolean)
+  const galleryFiles = galleryRows
+    .map(mediaLinkFromArrayRow)
+    .filter((file): file is NonNullable<ReturnType<typeof mediaLinkFromArrayRow>> => Boolean(file))
 
   return (
     <div className="mv-admin-view gutter--left gutter--right">
@@ -275,7 +232,7 @@ export const AdminVehicleDetailView = async ({
                 <th>Status naplate</th>
                 <th>Ukupno</th>
                 <th>Fajlovi</th>
-                <th>Admin</th>
+                <th>Linkovi</th>
               </tr>
             </thead>
             <tbody>
@@ -319,10 +276,11 @@ export const AdminVehicleDetailView = async ({
                       </td>
                       <td>
                         {serviceID ? (
-                          <a href={adminLink(`/collections/services/${serviceID}`)}>Otvori</a>
-                        ) : (
-                          '-'
-                        )}
+                          <div className="mv-inline-links">
+                            <a href={adminLink(`/servisi/${serviceID}`)}>Detalj</a>
+                            <a href={adminLink(`/collections/services/${serviceID}`)}>Admin</a>
+                          </div>
+                        ) : '-'}
                       </td>
                     </tr>
                   )

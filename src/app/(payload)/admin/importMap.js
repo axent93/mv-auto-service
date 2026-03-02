@@ -5,6 +5,7 @@ import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc056
 import { AdminDashboardView as AdminDashboardView_c31221c6cc6e1b5ff09f4e4ea9e4b28a } from '@/components/payload/views/AdminDashboardView'
 import { AdminSearchView as AdminSearchView_67ce5b93664729accc4b6010c52d211e } from '@/components/payload/views/AdminSearchView'
 import { AdminVehicleDetailView as AdminVehicleDetailView_f5792cf1d490a4a8e213a397f7a4c6ee } from '@/components/payload/views/AdminVehicleDetailView'
+import { AdminServiceDetailView as AdminServiceDetailView_3707aa09a51c5fb2b4790eba36a4cf49 } from '@/components/payload/views/AdminServiceDetailView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -15,5 +16,6 @@ export const importMap = {
   "@/components/payload/views/AdminDashboardView#AdminDashboardView": AdminDashboardView_c31221c6cc6e1b5ff09f4e4ea9e4b28a,
   "@/components/payload/views/AdminSearchView#AdminSearchView": AdminSearchView_67ce5b93664729accc4b6010c52d211e,
   "@/components/payload/views/AdminVehicleDetailView#AdminVehicleDetailView": AdminVehicleDetailView_f5792cf1d490a4a8e213a397f7a4c6ee,
+  "@/components/payload/views/AdminServiceDetailView#AdminServiceDetailView": AdminServiceDetailView_3707aa09a51c5fb2b4790eba36a4cf49,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
