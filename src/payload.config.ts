@@ -5,7 +5,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
-
+import { s3Storage } from '@payloadcms/storage-s3'
 import { Clients } from './collections/Clients'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -77,5 +77,24 @@ export default buildConfig({
     push: true,
   }),
   sharp,
-  plugins: [],
+  plugins: [
+    s3Storage({
+      collections: {
+        media: true,
+      },
+      enabled: process.env.NODE_ENV === 'production',
+      disableLocalStorage: false,
+      acl: 'private',
+      bucket: process.env.AWS_S3_BUCKET_NAME as string,
+      config: {
+        endpoint: process.env.AWS_ENDPOINT_URL,
+        forcePathStyle: true,
+        region: process.env.AWS_DEFAULT_REGION, // dummy region for AWS SDK
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+        },
+      },
+    }),
+  ],
 })
