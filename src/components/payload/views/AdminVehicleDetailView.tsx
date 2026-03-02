@@ -1,8 +1,8 @@
-import Image from 'next/image'
 import type { AdminViewServerProps } from 'payload'
 import { formatAdminURL } from 'payload/shared'
 
 import { MVHeaderNav, resolveAdminLogoutPath } from '@/components/payload/HeaderQuickLinks'
+import { MediaLightboxGrid } from '@/components/payload/MediaLightboxGrid'
 import { relationId, readNumber, readString, toRecord } from '@/lib/doc'
 import { formatCurrency, formatDate, formatNumber } from '@/lib/formatters'
 import {
@@ -190,29 +190,7 @@ export const AdminVehicleDetailView = async ({
         {galleryFiles.length === 0 ? (
           <p>Nema dodatih slika ili dokumenata.</p>
         ) : (
-          <div className="mv-media-grid">
-            {galleryFiles.map((file) =>
-              file ? (
-                <a href={file.url} key={`${file.url}-${file.filename}`} rel="noreferrer" target="_blank">
-                  <div className="mv-media-grid__item">
-                    {file.isImage ? (
-                      <Image
-                        alt={file.filename}
-                        height={140}
-                        loading="lazy"
-                        src={file.url}
-                        unoptimized
-                        width={220}
-                      />
-                    ) : (
-                      <div className="mv-media-grid__pdf">PDF</div>
-                    )}
-                    <p>{file.filename}</p>
-                  </div>
-                </a>
-              ) : null,
-            )}
-          </div>
+          <MediaLightboxGrid files={galleryFiles} hintText="Kliknite na fajl za prikaz bez izlaska iz aplikacije." />
         )}
       </section>
 

@@ -133,8 +133,8 @@ export const AdminDashboardView = async ({ payload, initPageResult }: AdminViewS
           <a href={adminLink('/collections/services')}>Svi servisi</a>
         </div>
 
-        <div className="mv-table-wrap">
-          <table className="mv-table">
+        <div className="mv-table-wrap mv-dashboard-services__desktop">
+          <table className="mv-table mv-table--dashboard">
             <thead>
               <tr>
                 <th>Datum</th>
@@ -192,6 +192,49 @@ export const AdminDashboardView = async ({ payload, initPageResult }: AdminViewS
             </tbody>
           </table>
         </div>
+
+        <ul className="mv-list mv-dashboard-services__mobile">
+          {latestServices.length === 0 ? (
+            <li>Nema evidentiranih servisa.</li>
+          ) : (
+            latestServices.map((service, index) => {
+              const serviceRecord = toRecord(service)
+              const serviceID = relationId(serviceRecord)
+              const vehicle = serviceRecord?.vehicle
+              const vehicleID = relationId(vehicle)
+              const vehicleName = getVehicleName(vehicle)
+              const clientName =
+                readString(serviceRecord, 'clientSnapshotName') || getClientName(toRecord(vehicle)?.client)
+
+              const serviceType = readString(serviceRecord, 'serviceType')
+              const paymentStatus = readString(serviceRecord, 'paymentStatus')
+              const totalPriceValue = serviceRecord?.totalPrice
+              const totalPrice =
+                typeof totalPriceValue === 'number' && Number.isFinite(totalPriceValue) ? totalPriceValue : null
+
+              return (
+                <li key={`mobile-${relationId(serviceRecord) || `${serviceType}-${index}`}`}>
+                  <div>
+                    <strong>{clientName || '-'}</strong>
+                    <p>{vehicleName}</p>
+                    <p>
+                      {formatDate(readString(serviceRecord, 'serviceDate'))} |{' '}
+                      {serviceTypeLabels[serviceType] || serviceType || '-'}
+                    </p>
+                    <p>
+                      Status: {paymentStatusLabels[paymentStatus] || '-'} | Iznos: {formatCurrency(totalPrice)}
+                    </p>
+                  </div>
+                  <div className="mv-inline-links">
+                    {serviceID ? <a href={adminLink(`/servisi/${serviceID}`)}>Servis</a> : null}
+                    {vehicleID ? <a href={adminLink(`/vozila/${vehicleID}`)}>Vozilo</a> : null}
+                    {!serviceID && !vehicleID ? '-' : null}
+                  </div>
+                </li>
+              )
+            })
+          )}
+        </ul>
       </section>
 
       <section className="mv-admin-grid mv-admin-grid--split">

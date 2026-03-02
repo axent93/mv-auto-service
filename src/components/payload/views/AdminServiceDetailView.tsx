@@ -1,8 +1,8 @@
-import Image from 'next/image'
 import type { AdminViewServerProps } from 'payload'
 import { formatAdminURL } from 'payload/shared'
 
 import { MVHeaderNav, resolveAdminLogoutPath } from '@/components/payload/HeaderQuickLinks'
+import { MediaLightboxGrid } from '@/components/payload/MediaLightboxGrid'
 import { readNumber, readString, relationId, toRecord } from '@/lib/doc'
 import { formatCurrency, formatDate, formatNumber } from '@/lib/formatters'
 import {
@@ -61,21 +61,7 @@ const MediaPanel = ({
   return (
     <article className="mv-card">
       <h2>{title}</h2>
-      <div className="mv-media-grid">
-        {files.map((file) => (
-          <a className="mv-media-grid__link" href={file.url} key={`${title}-${file.url}`} rel="noreferrer" target="_blank">
-            <div className="mv-media-grid__item">
-              {file.isImage ? (
-                <Image alt={file.filename} height={140} loading="lazy" src={file.url} unoptimized width={220} />
-              ) : (
-                <div className="mv-media-grid__pdf">PDF</div>
-              )}
-              <p>{file.filename}</p>
-            </div>
-          </a>
-        ))}
-      </div>
-      <p className="mv-media-grid__hint">Kliknite na fajl za uvecani prikaz.</p>
+      <MediaLightboxGrid files={files} hintText="Kliknite na fajl za prikaz bez izlaska iz aplikacije." />
     </article>
   )
 }
