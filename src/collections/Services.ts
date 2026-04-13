@@ -113,6 +113,9 @@ export const Services: CollectionConfig = {
     update: isAuthenticated,
   },
   admin: {
+    components: {
+      beforeListTable: ['@/components/payload/ServiceOwnerVehicleChooser#ServiceOwnerVehicleChooser'],
+    },
     defaultColumns: [
       'serviceDate',
       'serviceType',
@@ -122,6 +125,7 @@ export const Services: CollectionConfig = {
       'totalPrice',
       'paymentStatus',
     ],
+    listSearchableFields: ['clientSnapshotName'],
     useAsTitle: 'serviceType',
   },
   hooks: {
@@ -155,7 +159,7 @@ export const Services: CollectionConfig = {
         readOnly: true,
       },
       index: true,
-      label: 'Ime klijenta (snapshot)',
+      label: 'Vlasnik (snapshot)',
     },
     {
       name: 'serviceType',

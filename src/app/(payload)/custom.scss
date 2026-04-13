@@ -783,6 +783,17 @@ html[data-theme='dark'] .btn--style-primary {
   height: calc(var(--base) * 0.78);
 }
 
+.mv-service-owner-chooser {
+  display: grid;
+  gap: calc(var(--base) * 0.5);
+}
+
+.mv-service-owner-chooser__hint,
+.mv-service-owner-chooser__empty {
+  margin: 0;
+  color: var(--theme-elevation-500);
+}
+
 .mv-table-wrap {
   overflow-x: auto;
 }

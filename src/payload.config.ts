@@ -74,6 +74,7 @@ const csrf = Array.from(
 export default buildConfig({
   admin: {
     user: Users.slug,
+    suppressHydrationWarning: true,
     theme: 'dark',
     components: {
       Nav: false,

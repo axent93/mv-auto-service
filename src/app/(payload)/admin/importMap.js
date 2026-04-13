@@ -1,3 +1,4 @@
+import { ServiceOwnerVehicleChooser as ServiceOwnerVehicleChooser_602386c3649d7feffad1a44d220dc8e1 } from '@/components/payload/ServiceOwnerVehicleChooser'
 import { MVAdminIcon as MVAdminIcon_9b810b0a034a4423b18630e49c564b08 } from '@/components/payload/graphics/Icon'
 import { MVAdminLogo as MVAdminLogo_0f647c81361fea2daf5fc52d3970e351 } from '@/components/payload/graphics/Logo'
 import { HeaderQuickLinks as HeaderQuickLinks_7b22a47bb4a99a251a2078b996786701 } from '@/components/payload/HeaderQuickLinks'
@@ -9,6 +10,7 @@ import { AdminServiceDetailView as AdminServiceDetailView_3707aa09a51c5fb2b4790e
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
+  "@/components/payload/ServiceOwnerVehicleChooser#ServiceOwnerVehicleChooser": ServiceOwnerVehicleChooser_602386c3649d7feffad1a44d220dc8e1,
   "@/components/payload/graphics/Icon#MVAdminIcon": MVAdminIcon_9b810b0a034a4423b18630e49c564b08,
   "@/components/payload/graphics/Logo#MVAdminLogo": MVAdminLogo_0f647c81361fea2daf5fc52d3970e351,
   "@/components/payload/HeaderQuickLinks#HeaderQuickLinks": HeaderQuickLinks_7b22a47bb4a99a251a2078b996786701,
